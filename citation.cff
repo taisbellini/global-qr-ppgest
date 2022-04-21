@@ -1,8 +1,10 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-  - family-names: Bellini, Horta
-    given-names: Tais, Eduardo
+  - family-names: Bellini
+    given-names: Tais
+  - family-names: Horta
+    given-names: Eduardo
 title: "Global variable selection for quantile regression"
 version: 1.0.0
 date-released: 2022-04
