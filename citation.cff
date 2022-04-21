@@ -8,3 +8,4 @@ authors:
 title: "Global variable selection for quantile regression"
 version: 1.0.0
 date-released: 2022-04
+url: "https://github.com/taisbellini/global-qr-ppgest"
