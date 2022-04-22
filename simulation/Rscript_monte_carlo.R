@@ -10,9 +10,9 @@ if (length(args)==0) {
 
 N = as.numeric(args[1])
 M = L = as.numeric(args[2])
-nrep_s = as.numeric(args[5])
-nrep_e = as.numeric(args[6])
-lambdas = ifelse(is.na(args[7]), 100, as.numeric(args[7]))
+nrep_s = as.numeric(args[3])
+nrep_e = as.numeric(args[4])
+lambdas = ifelse(is.na(args[5]), 100, as.numeric(args[5]))
 lasso_lambda = "opt"
 gLasso_lambda = "opt"
 
@@ -40,7 +40,7 @@ source("core/utils.R")
 source("core/global_qr_CVXR.R")
 
 ## Opt params
-tau.grid = tau.grid_generator(L, M, delta = delta)
+tau.grid = tau.grid_generator(L, M)
 phi = phi_generator2(L,tau.grid)
 lambdas_to_try = round(10^seq(-3, 3, length.out = lambdas), 4)
 
@@ -58,21 +58,21 @@ sim = foreach(i=nrep_s:nrep_e,  .export= fun_vec, .packages = pack_vec, .combine
   X = X_array[1:N,,i]
   y = Y_array[1:N,i]
 
-  lasso_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = lasso_lambda, f = "lasso", s=s, w = F, lambdas = lambdas_to_try, type = "par")
+  lasso_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = lasso_lambda, f = "lasso", w = F, lambdas = lambdas_to_try, type = "par")
   
-  gLasso_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = gLasso_lambda, f = "gLasso", s=s, w = F, lambdas = lambdas_to_try, type = "par")
+  gLasso_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = gLasso_lambda, f = "gLasso", w = F, lambdas = lambdas_to_try, type = "par")
   
-  lassoW_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = lasso_lambda, f = "lasso", s=s, w = T, lambdas = lambdas_to_try, type = "par")
+  lassoW_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = lasso_lambda, f = "lasso", w = T, lambdas = lambdas_to_try, type = "par")
   
-  gLassoW_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = gLasso_lambda, f = "gLasso", s=s, w = T, lambdas = lambdas_to_try, type = "par")
+  gLassoW_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = gLasso_lambda, f = "gLasso", w = T, lambdas = lambdas_to_try, type = "par")
   
-  naivelasso_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = lasso_lambda, f = "lasso", s=s, w = F, lambdas = lambdas_to_try, type = "naive")
+  naivelasso_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = lasso_lambda, f = "lasso", w = F, lambdas = lambdas_to_try, type = "naive")
   
-  naivegLasso_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = gLasso_lambda, f = "gLasso", s=s, w = F, lambdas = lambdas_to_try, type = "naive")
+  naivegLasso_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = gLasso_lambda, f = "gLasso", w = F, lambdas = lambdas_to_try, type = "naive")
   
-  naivelassoW_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = lasso_lambda, f = "lasso", s=s, w = T, lambdas = lambdas_to_try, type = "naive")
+  naivelassoW_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = lasso_lambda, f = "lasso", w = T, lambdas = lambdas_to_try, type = "naive")
   
-  naivegLassoW_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = gLasso_lambda, f = "gLasso", s=s, w = T, lambdas = lambdas_to_try, type = "naive")
+  naivegLassoW_CVXR = global_qr_CVXR(taus = tau.grid, phi = phi, X = X, y = y, lambda = gLasso_lambda, f = "gLasso", w = T, lambdas = lambdas_to_try, type = "naive")
 
   return(cbind(lasso_CVXR, gLasso_CVXR, lassoW_CVXR, gLassoW_CVXR, naivelasso_CVXR, naivegLasso_CVXR, naivelassoW_CVXR, naivegLassoW_CVXR))
   
@@ -84,8 +84,8 @@ end = Sys.time()
 time = end - start
 print(time)
 
-filename = sprintf("results/results_N%0.0f_M%0.0f_from%0.0f_to%0.0f.RData", N, M, delta, s, nrep_s, nrep_e)
-#filename = sprintf("results/resultsbetaStrong_N%0.0f_M%0.0f_from%0.0f_to%0.0f.RData", N, M, delta, s, nrep_s, nrep_e)
+filename = sprintf("results/RData_outputs/results_N%0.0f_M%0.0f_from%0.0f_to%0.0f.RData", N, M, nrep_s, nrep_e)
+#filename = sprintf("results/RData_outputs/resultsbetaStrong_N%0.0f_M%0.0f_from%0.0f_to%0.0f.RData", N, M, delta, s, nrep_s, nrep_e)
 save(sim, file = filename)
 
 
